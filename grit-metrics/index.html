@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GRIT Metrics - 4 Tests</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0a0f0c;color:#f5f0e6;font-family:-apple-system,system-ui,sans-serif;padding:14px 14px 70px}
+.top{display:flex;justify-content:space-between;align-items:center}h1{font-size:30px;margin:6px 0 0}h1 span{color:#d4af6a}.sub{color:#b8c0b5;font-size:13px;margin:4px 0 14px}
+.card{background:#151d18;border:1px solid #2a352c;border-radius:18px;padding:14px;margin-bottom:12px}
+label{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#d4af6a;display:block;margin:12px 0 6px}
+input,select{width:100%;background:#0f1511;color:#fff;border:1px solid #333f36;border-radius:11px;padding:13px;font-size:16px}
+input[type=file]{border:1px dashed #d4af6a;padding:12px}
+video{width:100%;border-radius:12px;background:#000;max-height:48vh}
+.btn{background:#d4af6a;color:#111;border:0;border-radius:13px;padding:15px;font-weight:800;font-size:16px;width:100%;margin-top:10px}
+.btn2{background:#2a352c;color:#fff}.btnSmall{padding:12px;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+.testBtn{border:1px solid #2a352c;background:#0f1511;color:#fff;border-radius:14px;padding:12px;text-align:left}.testBtn.active{border-color:#d4af6a;background:#2a2a1a}.testBtn b{display:block;font-size:15px}.testBtn span{font-size:12px;color:#b8c0b5}
+.kpi{background:#0f1511;border:1px solid #2a352c;border-radius:12px;padding:12px;text-align:center}.kpi b{font-size:26px;color:#d4af6a;display:block}.kpi span{font-size:11px;color:#b8c0b5}
+.small{font-size:13px;color:#b8c0b5;line-height:1.55}.pill{display:inline-block;background:#2a352c;border-radius:999px;padding:6px 10px;font-size:12px;margin:2px}
+input[type=range]{width:100%;accent-color:#d4af6a}.step{background:#d4af6a;color:#111;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;margin-right:6px}
+.check{font-size:13px;line-height:1.6;color:#e8e2d5}.check b{color:#d4af6a}
+</style></head><body>
+<div class="top"><div><h1>GRIT <span>METRICS</span></h1><div class="sub">4 tests &nbsp;•&nbsp; iPhone only &nbsp;•&nbsp; Upload, tap, done</div></div><div style="font-size:28px">⚡</div></div>
+
+<div class="card">
+<label>Athlete</label><input id="athlete" placeholder="Name - e.g. Mackenzie">
+<div class="grid2"><div><label>Sport</label><select id="sport"><option>Softball</option><option>Baseball</option></select></div><div><label>Date</label><input id="date" type="text"></div></div>
+<label>Choose Test - Only These 4</label>
+<div class="grid2" id="testGrid"></div>
+<div class="small" id="testDesc" style="margin-top:10px"></div>
+</div>
+
+<div class="card">
+<div><span class="step">1</span><b>Record in iPhone Camera</b></div>
+<div class="check" id="setup"></div>
+<label>2. Upload trimmed clip</label>
+<input id="file" type="file" accept="video/*">
+<div class="small" style="margin-top:6px">Trim in Photos first: start just before the move, end just after. Keep the same ball weight and same distance every week.</div>
+</div>
+
+<div class="card">
+<video id="vid" controls playsinline></video>
+<div class="grid2"><div><label>FPS - leave at 240</label><select id="fps"><option value="240">240fps Slo-mo</option><option value="120">120fps Slo-mo</option><option value="60">60fps</option></select></div><div><label>Current Frame</label><input id="cur" readonly></div></div>
+<label>Scrub</label><input id="scrub" type="range" min="0" max="1000" value="0">
+<div class="grid2"><button class="btn btn2 btnSmall" onclick="stepF(-1)">◀ -1 Frame</button><button class="btn btn2 btnSmall" onclick="stepF(1)">+1 Frame ▶</button></div>
+<div class="grid2"><button class="btn btn2 btnSmall" onclick="stepF(-5)">◀ -5 Frames</button><button class="btn btn2 btnSmall" onclick="stepF(5)">+5 Frames ▶</button></div>
+</div>
+
+<div class="card">
+<div><span class="step">3</span><b>Tap to Mark - Big Buttons</b></div>
+<div class="small" id="markHelp" style="margin-top:8px"></div>
+<div id="markBtns"></div>
+<div id="marks" style="margin-top:10px"></div>
+<label>Extra - Only If You Have It</label><div id="extras"></div>
+<button class="btn" onclick="analyze()">⚡ AUTO-ANALYZE</button>
+</div>
+
+<div class="card">
+<div><span class="step">4</span><b>Result</b></div>
+<div class="grid2" id="results" style="margin-top:10px"><div class="kpi"><b>--</b><span>Upload + mark</span></div><div class="kpi"><b>--</b><span>Then analyze</span></div></div>
+<div class="small" id="explain" style="margin-top:10px"></div>
+<div class="small" id="coachNote" style="margin-top:8px;background:#0f1511;padding:10px;border-radius:10px"></div>
+<button class="btn btn2" onclick="saveResult()">Save This Result</button>
+<button class="btn btn2" onclick="clearAll()">Clear Marks / Next Athlete</button>
+<div id="saved" style="margin-top:10px"></div>
+</div>
+
+<div class="card"><b>What you need this week</b><div class="small" style="margin-top:6px">• iPhone 17 Pro + tripod<br>• 1 med ball, same weight every time (4-6 lbs)<br>• Tape measure or cone for distance<br>• Bat + ball / tee<br>• 10 ft clear space side view, 20 ft front view for pitching<br>• Warmup first, 3 reps per test, keep best<br>• No radar needed. Radar is a bonus for swing speed only.</div></div>
+
+<script>
+document.getElementById('date').value=new Date().toLocaleDateString();
+let tests={
+ leg:{name:'1. Leg Drive',short:'Drive + Brace',desc:'Does the back leg drive and front leg brace so hips can snap? Best for pitching + hitting.',setup:'<b>Camera:</b> SIDE view, tripod 15 ft away, hip height.<br><b>iPhone:</b> Slo-mo 240fps.<br><b>Do:</b> 3 pitches or 3 swings. Load back hip, drive, land front foot, brace.',help:'Mark 3 moments: BACK LEG STARTS DRIVE, FRONT FOOT LANDS, RELEASE / CONTACT.',keys:['Drive Starts','Front Foot Lands','Release / Contact'],extras:'<label>Finish Balance (1-5, 5 = tall + still)</label><input id="ex1" type="number" value="4" min="1" max="5">'},
+ rot:{name:'2. Rotational Med Ball',short:'Rotation Power',desc:'Does leg drive turn into fast rotation? Distance is power, time is speed.',setup:'<b>Camera:</b> SIDE view, 15 ft away.<br><b>iPhone:</b> Slo-mo 240fps.<br><b>Do:</b> Side-on throw, 3 reps, same ball. Load back hip, drive, rotate, throw.',help:'Mark 2 moments: THROW STARTS (hands move) then RELEASE (ball leaves hands). Enter distance below.',keys:['Throw Starts','Release'],extras:'<label>Med Ball Weight (lbs) - keep same</label><input id="ex1" type="number" value="6"><label>Throw Distance (ft) - tape measure</label><input id="ex2" type="number" value="32">'},
+ swing:{name:'3. Bat Swing Speed',short:'Swing Time + MPH',desc:'How fast is the barrel? Swing time from video, MPH estimate + radar if you have it.',setup:'<b>Camera:</b> SIDE view, 15-20 ft away, see full swing.<br><b>iPhone:</b> Slo-mo 240fps.<br><b>Do:</b> 3 swings off tee or front toss. Normal swing, no max effort hack.',help:'Mark 2 moments: SWING STARTS (hands go forward) then CONTACT.',keys:['Swing Starts','Contact'],extras:'<label>Bat Length (in)</label><input id="ex1" type="number" value="33"><label>Radar MPH (optional, leave blank if none)</label><input id="ex2" type="number" placeholder="e.g. 62">'},
+ whip:{name:'4. Whip / Separation',short:'Hip to Shoulder Gap',desc:'The whip metric. Hips go, shoulders wait a beat, then whip through. That gap is power.',setup:'<b>Camera:</b> FRONT 45° view, 20 ft away, see hips + shoulders.<br><b>iPhone:</b> Slo-mo 240fps.<br><b>Do:</b> 3 swings or 3 pitches. Watch hips first, shoulders second.',help:'Mark 2 moments: HIPS START ROTATING then SHOULDERS START ROTATING. Small gap = good whip.',keys:['Hips Start','Shoulders Start'],extras:'<label>Move</label><select id="ex1"><option>Swing</option><option>Pitch</option></select>'}
+};
+let current='leg', marks={}, vid=document.getElementById('vid');
+function renderTests(){
+ document.getElementById('testGrid').innerHTML=Object.entries(tests).map(([k,v])=>`<button class="testBtn ${k==current?'active':''}" onclick="setTest('${k}')"><b>${v.name}</b><span>${v.short}</span></button>`).join('');
+ document.getElementById('testDesc').textContent=tests[current].desc;
+ document.getElementById('setup').innerHTML=tests[current].setup;
+ document.getElementById('markHelp').textContent=tests[current].help;
+ document.getElementById('markBtns').innerHTML=tests[current].keys.map(k=>`<button class="btn btn2" onclick="mark('${k}')">📍 Mark: ${k}</button>`).join('');
+ document.getElementById('extras').innerHTML=tests[current].extras;
+ document.getElementById('marks').innerHTML=Object.keys(marks).length?Object.entries(marks).map(([k,v])=>`<span class="pill">${k}: ${v} (${(v/getFps()).toFixed(3)}s)</span>`).join(''):'No marks yet - play video, pause at moment, tap Mark.';
+}
+function setTest(k){current=k;marks={};renderTests();}
+function getFps(){return parseFloat(document.getElementById('fps').value)||240}
+function mark(k){if(!vid.duration){alert('Upload a video first');return;} marks[k]=Math.round(vid.currentTime*getFps()); renderTests();}
+function clearAll(){marks={};renderTests();document.getElementById('results').innerHTML='<div class="kpi"><b>--</b><span>Upload + mark</span></div><div class="kpi"><b>--</b><span>Then analyze</span></div>';document.getElementById('explain').textContent='';document.getElementById('coachNote').textContent='';}
+document.getElementById('file').onchange=e=>{let f=e.target.files[0];if(!f)return;vid.src=URL.createObjectURL(f);vid.load();marks={};renderTests();};
+vid.ontimeupdate=()=>{document.getElementById('cur').value='Frame '+Math.round(vid.currentTime*getFps())+' | '+vid.currentTime.toFixed(3)+'s'; if(vid.duration) document.getElementById('scrub').value=Math.round(vid.currentTime/vid.duration*1000);};
+document.getElementById('scrub').oninput=e=>{vid.currentTime=vid.duration*e.target.value/1000;vid.pause();};
+function stepF(d){vid.pause();vid.currentTime=Math.max(0,vid.currentTime+d/getFps());}
+function analyze(){
+ let fps=getFps(), need=tests[current].keys; if(need.some(k=>marks[k]==null)){alert('Mark all: '+need.join(', '));return;}
+ let r='',ex='',note='';
+ if(current=='leg'){let drive=(marks['Front Foot Lands']-marks['Drive Starts'])/fps; let brace=(marks['Release / Contact']-marks['Front Foot Lands'])/fps; let bal=parseFloat(document.getElementById('ex1').value)||4;
+  r=`<div class="kpi"><b>${drive.toFixed(3)}s</b><span>Drive to Landing</span></div><div class="kpi"><b>${brace.toFixed(3)}s</b><span>Landing to Release</span></div>`;
+  ex=`Drive time ${drive.toFixed(3)}s, brace to release ${brace.toFixed(3)}s. Total ${ (drive+brace).toFixed(3)}s. Shorter drive + quick brace = better transfer.`;
+  note=bal>=4?'Coach note: Finish looked tall and balanced. Front leg braced well. Leg drive transferred.':bal==3?'Coach note: Some forward drift on finish. Cue: land and stick the front leg, finish tall.':'Coach note: Falling forward on finish. Front leg not bracing yet. Work on land and stick drills before adding speed.';}
+ if(current=='rot'){let dt=(marks['Release']-marks['Throw Starts'])/fps; let w=parseFloat(document.getElementById('ex1').value)||6; let d=parseFloat(document.getElementById('ex2').value)||0;
+  r=`<div class="kpi"><b>${d.toFixed(1)} ft</b><span>${w}lb Med Ball</span></div><div class="kpi"><b>${dt.toFixed(3)}s</b><span>Throw Time</span></div>`;
+  ex=`Throw time ${dt.toFixed(3)}s for ${d}ft with ${w}lb ball. Track distance week to week with SAME ball. If distance goes up and time stays same or drops, rotation is getting faster AND more powerful.`;
+  note=dt<0.35?'Coach note: Fast rotation. Hips led, shoulders followed.':'Coach note: Rotation a bit slow. Cue: drive back leg first, let hips go, hands last.';}
+ if(current=='swing'){let dt=(marks['Contact']-marks['Swing Starts'])/fps; let bat=(parseFloat(document.getElementById('ex1').value)||33)/12; let mphEst=(Math.PI*bat/dt)*0.681818; let radar=document.getElementById('ex2').value;
+  r=`<div class="kpi"><b>${radar?radar+' mph':'~'+mphEst.toFixed(0)+' mph'}</b><span>${radar?'Radar - True':'Est. Barrel Speed'}</span></div><div class="kpi"><b>${dt.toFixed(3)}s</b><span>Swing Time</span></div>`;
+  ex=`Swing time ${dt.toFixed(3)}s. Video estimate ${mphEst.toFixed(0)} mph from ${bat.toFixed(2)}ft bat. ${radar?'Radar '+radar+' mph is your true number, use video time to compare quickness.':'No radar entered, so MPH is an estimate from timing. Use swing time to compare week to week.'}`;
+  note=dt<0.22?'Coach note: Quick swing. Check barrel stayed on plane, not cutting across.':dt<0.30?'Coach note: Solid swing time. Next step is keeping hips ahead of hands for more whip.':'Coach note: Swing is a bit long. Check load: hips should start, hands stay back, then whip.';}
+ if(current=='whip'){let gap=(marks['Shoulders Start']-marks['Hips Start'])/fps; let frames=marks['Shoulders Start']-marks['Hips Start'];
+  r=`<div class="kpi"><b>${frames} frames</b><span>Hip to Shoulder Gap</span></div><div class="kpi"><b>${(gap*1000).toFixed(0)} ms</b><span>Separation Time</span></div>`;
+  ex=`Hips started frame ${marks['Hips Start']}, shoulders frame ${marks['Shoulders Start']}. Gap ${frames} frames = ${(gap*1000).toFixed(0)}ms at ${fps}fps. A small gap is good whip. 0 frames = everything turned together, no stretch.`;
+  note=frames>=2&&frames<=6?'Coach note: Great whip. Hips led, shoulders waited, then snapped through. This is the separation you want.':frames<2?'Coach note: No separation. Hips and shoulders turned together. Cue: hips go, shoulders stay closed a beat, then whip.':frames>6?'Coach note: Shoulders waited too long, power leaked. Cue: hips go, shoulders follow quickly, do not hold.';}
+ document.getElementById('results').innerHTML=r; document.getElementById('explain').textContent=ex; document.getElementById('coachNote').textContent=note;
+}
+function saveResult(){let name=document.getElementById('athlete').value||'Athlete';let d=document.createElement('div');d.className='small';d.style.cssText='background:#0f1511;padding:10px;border-radius:10px;margin-top:6px';d.textContent=new Date().toLocaleString()+' - '+name+' - '+tests[current].name+' - '+document.getElementById('results').innerText.replace(/\n/g,' | ');document.getElementById('saved').appendChild(d);}
+renderTests();
+</script></body></html>
